@@ -13,11 +13,18 @@ class LogLevel(Enum):
 class LogEntry:
     timestamp: datetime
     level: LogLevel
-    method: str
+    method: HTTPMethod
     endpoint: str
     status_code: int
     response_time: int
 
+
+class HTTPMethod(Enum):
+    GET = "GET"         # получить
+    POST = "POST"       # отправить
+    PUT = "PUT"
+    PATCH = "PATCH"
+    DELETE = "DELETE"
 
 
 # LogLevel — допустимые уровни логов.
@@ -27,3 +34,4 @@ class LogEntry:
 # endpoint — например /api/users.
 # status_code — например 200, 404, 500.
 # response_time — время ответа в миллисекундах.
+
