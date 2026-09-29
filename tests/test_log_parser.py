@@ -25,6 +25,82 @@ def test_parse_invalid_log_line():
         parse_log_line(log_line)
 
 
+def test_invalid_status_code():
+    log_line = "2026-09-24 10:15:02 ERROR POST /api/login ABC 340ms"
+
+    with pytest.raises(ValueError):
+        parse_log_line(log_line)
+
+
+def test_invalid_response_time():
+    log_line = "2026-09-24 10:15:02 ERROR POST /api/login 500 ABCms"
+
+    with pytest.raises(ValueError):
+        parse_log_line(log_line)
+
+
+def test_invalid_log_level():
+    log_line = "2026-09-24 10:15:02 UNKNOWN POST /api/login 500 340ms"
+
+    with pytest.raises(ValueError):
+        parse_log_line(log_line)
+  
+
+def test_invalid_http_method():
+    log_line = "2026-09-24 10:15:02 ERROR FETCH /api/login 500 340ms"
+
+    with pytest.raises(ValueError):
+        parse_log_line(log_line)
+   
+
+def test_invalid_timestamp():
+    log_line = "2026-99-99 10:15:02 ERROR FETCH /api/login 500 340ms"
+
+    with pytest.raises(ValueError):
+        parse_log_line(log_line)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
