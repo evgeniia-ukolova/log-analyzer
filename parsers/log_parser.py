@@ -6,6 +6,10 @@ from models.log_entry import LogLevel, HTTPMethod, LogEntry
 
 def parse_log_line(log_line: str) -> LogEntry:                  # превращает одну строку лога в объект LogEntry
     parts = log_line.split()
+
+    if len(parts) != 7:
+        raise ValueError("Некорректный формат строки лога")
+
     date_str, time_str, level_str, method, endpoint, status_code_str, response_time_str = parts
 
     timestamp = f"{date_str} {time_str}"
@@ -28,5 +32,6 @@ def parse_log_line(log_line: str) -> LogEntry:                  # превращ
         response_time=response_time,
     )
     return log_entry
+
 
 

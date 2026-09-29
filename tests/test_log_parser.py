@@ -1,3 +1,4 @@
+import pytest
 from datetime import datetime
 
 from models.log_entry import LogLevel, HTTPMethod
@@ -17,8 +18,11 @@ def test_parse_log_line():
     assert result.response_time == 340
 
 
+def test_parse_invalid_log_line():
+    log_line = "2026-09-24 ERROR POST"
 
-
+    with pytest.raises(ValueError):
+        parse_log_line(log_line)
 
 
 
