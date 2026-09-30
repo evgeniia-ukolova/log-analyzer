@@ -63,15 +63,28 @@ def count_endpoints(entries):
     return endpoints_counts
 
 
+def top_endpoints(entries):
+    endpoint_counts = count_endpoints(entries)
+
+    sorted_endpoints = sorted(
+    endpoint_counts.items(),
+    key=lambda item: item[1],
+    reverse=True,
+    )
+
+    return sorted_endpoints
 
 
+def slowest_requests(entries):
+    entries = list(entries)
 
+    result = sorted(
+        entries,
+        key=lambda entry: entry.response_time,
+        reverse=True,
+    )
 
-
-
-
-
-
+    return result
 
 
 

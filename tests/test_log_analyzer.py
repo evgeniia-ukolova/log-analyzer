@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from readers.log_reader import read_log_entries
-from analyzers.log_analyzer import count_requests, count_status_codes, count_errors, average_response_time, count_endpoints
+from analyzers.log_analyzer import count_requests, count_status_codes, count_errors, average_response_time, count_endpoints, top_endpoints, slowest_requests
 
 
 def test_count_requests():
@@ -78,10 +78,37 @@ def test_count_endpoints_empty():
     assert result == {}
 
 
+def test_top_endpoints():
+    entries = read_log_entries(Path("data/server.log"))
+
+    result = top_endpoints(entries)
+
+    assert result == [
+    ("/api/users/15", 2),
+    ("/api/users", 1),
+    ("/api/login", 1),
+    ("/api/products", 1),
+    ]
 
 
+def test_top_endpoints_empty():
+    result = top_endpoints([])
+
+    assert result == []
 
 
+def test_slowest_requests():
+    entries = read_log_entries(Path("data/server.log"))
+
+    result = slowest_requests(entries)
+
+    assert [entry.response_time for entry in result] == [340, 210, 180, 120, 95]
+
+
+def test_slowest_requests_empty():
+    result = slowest_requests([])
+
+    assert result == []
 
 
 
