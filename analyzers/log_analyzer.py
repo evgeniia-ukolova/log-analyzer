@@ -1,0 +1,107 @@
+
+
+
+def count_requests(entries):
+    count = 0
+
+    for entry in entries:
+        count += 1
+
+    return count
+
+
+def count_status_codes(entries):
+    status_counts = {}
+
+    for entry in entries:
+        status_code = entry.status_code
+
+        if status_code in status_counts:
+            status_counts[status_code] += 1
+        else:
+            status_counts[status_code] = 1
+
+    return status_counts
+
+
+def count_errors(entries):
+
+    count = 0
+    for entry in entries:
+
+        if entry.status_code >= 400:
+            count += 1
+
+    return count
+
+
+def average_response_time(entries):
+    total_time = 0
+    count = 0
+
+    for entry in entries:
+        total_time += entry.response_time
+        count += 1
+
+    if count == 0:
+        return 0
+
+    return total_time / count   
+
+
+def count_endpoints(entries):
+    endpoints_counts = {}
+
+    for entry in entries:
+        endpoint = entry.endpoint
+
+        if endpoint in endpoints_counts:
+            endpoints_counts[endpoint] += 1
+        else:
+            endpoints_counts[endpoint] = 1
+
+    return endpoints_counts
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
