@@ -1,7 +1,9 @@
 from pathlib import Path
 
 from readers.log_reader import read_log_entries
-from analyzers.log_analyzer import count_requests, count_status_codes, count_errors, average_response_time, count_endpoints, top_endpoints, slowest_requests
+from analyzers.log_analyzer import count_requests, count_status_codes, count_errors, average_response_time, count_endpoints, top_endpoints, slowest_requests, filter_by_level, filter_by_status, filter_by_method, filter_by_endpoint, filter_by_response_time
+from models.log_entry import LogLevel, HTTPMethod
+
 
 
 def test_count_requests():
@@ -109,6 +111,88 @@ def test_slowest_requests_empty():
     result = slowest_requests([])
 
     assert result == []
+
+
+def test_filter_by_level():
+    entries = read_log_entries(Path("data/server.log"))
+
+    result = list(filter_by_level(entries, LogLevel.ERROR))
+
+    assert len(result) == 1
+    assert result[0].level == LogLevel.ERROR
+
+
+def test_filter_by_status():
+    entries = read_log_entries(Path("data/server.log"))
+
+    result = list(filter_by_status(entries, 500))
+
+    assert len(result) == 1
+    assert result[0].status_code == 500
+
+
+def test_filter_by_method():
+    entries = read_log_entries(Path("data/server.log"))
+
+    result = list(filter_by_method(entries, HTTPMethod.DELETE))
+
+    assert len(result) == 1
+    assert result[0].method == HTTPMethod.DELETE
+  
+
+def test_filter_by_endpoint():
+    entries = read_log_entries(Path("data/server.log"))
+
+    result = list(filter_by_endpoint(entries, "/api/users/15"))
+
+    assert len(result) == 2
+    assert all(entry.endpoint == "/api/users/15" for entry in result) 
+
+
+def test_filter_by_response_time():
+    entries = read_log_entries(Path("data/server.log"))
+
+    result = list(filter_by_response_time(entries, 200))
+
+    assert len(result) == 2
+    assert all(entry.response_time >= 200 for entry in result)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

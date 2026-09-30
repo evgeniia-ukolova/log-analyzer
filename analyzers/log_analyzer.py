@@ -87,18 +87,34 @@ def slowest_requests(entries):
     return result
 
 
+def filter_by_level(entries, level):
+    for entry in entries:
+        if entry.level == level:
+            yield entry
 
 
+def filter_by_status(entries, status_code):
+    for entry in entries:
+        if entry.status_code == status_code:
+            yield entry
 
 
+def filter_by_method(entries, method):
+    for entry in entries:
+        if entry.method == method:
+            yield entry
+ 
+
+def filter_by_endpoint(entries, endpoint):
+    for entry in entries:
+        if entry.endpoint == endpoint:
+            yield entry
 
 
-
-
-
-
-
-
+def filter_by_response_time(entries, min_response_time):
+    for entry in entries:
+        if entry.response_time >= min_response_time:
+            yield entry
 
 
 
