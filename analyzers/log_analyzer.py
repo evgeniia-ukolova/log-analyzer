@@ -1,5 +1,4 @@
-
-
+from models.log_report import LogReport
 
 def count_requests(entries):
     count = 0
@@ -115,6 +114,69 @@ def filter_by_response_time(entries, min_response_time):
     for entry in entries:
         if entry.response_time >= min_response_time:
             yield entry
+
+
+def filter_by_date(entries, target_date):
+    for entry in entries:
+        if entry.timestamp.date() == target_date:
+            yield entry
+
+
+def build_report(entries):
+    total_requests = 0
+    error_count = 0
+    total_response_time = 0
+    status_counts = {}
+    endpoint_counts = {}
+
+    for entry in entries:
+        total_requests += 1
+        total_response_time += entry.response_time
+
+        if entry.status_code >= 400:
+            error_count += 1
+
+        if entry.status_code in status_counts:
+            status_counts[entry.status_code] += 1
+        else:
+            status_counts[entry.status_code] = 1
+
+        if entry.endpoint in endpoint_counts:
+            endpoint_counts[entry.endpoint] += 1
+        else:
+            endpoint_counts[entry.endpoint] = 1
+
+        if total_requests == 0:
+            average_response_time = 0
+        else:
+            average_response_time = total_response_time / total_requests
+
+    return LogReport(
+    total_requests=total_requests,
+    error_count=error_count,
+    average_response_time=average_response_time,
+    status_counts=status_counts,
+    endpoint_counts=endpoint_counts,
+    )
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

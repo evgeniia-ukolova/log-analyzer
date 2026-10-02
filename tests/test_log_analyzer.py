@@ -1,7 +1,23 @@
 from pathlib import Path
+from datetime import date
 
 from readers.log_reader import read_log_entries
-from analyzers.log_analyzer import count_requests, count_status_codes, count_errors, average_response_time, count_endpoints, top_endpoints, slowest_requests, filter_by_level, filter_by_status, filter_by_method, filter_by_endpoint, filter_by_response_time
+from analyzers.log_analyzer import (
+    count_requests, 
+    count_status_codes, 
+    count_errors, 
+    average_response_time, 
+    count_endpoints, 
+    top_endpoints, 
+    slowest_requests, 
+    filter_by_level, 
+    filter_by_status, 
+    filter_by_method, 
+    filter_by_endpoint, 
+    filter_by_response_time,
+    filter_by_date,
+    build_report
+    )
 from models.log_entry import LogLevel, HTTPMethod
 
 
@@ -158,10 +174,35 @@ def test_filter_by_response_time():
     assert all(entry.response_time >= 200 for entry in result)
 
 
+def test_filter_by_date():
+    entries = read_log_entries(Path("data/server.log"))
+
+    result = list(filter_by_date(entries, date(2026, 9, 24)))
+
+    assert len(result) == 5
+    assert all(entry.timestamp.date() == date(2026, 9, 24) for entry in result)
 
 
+def test_build_report():
+    entries = read_log_entries(Path("data/server.log"))
 
+    report = build_report(entries)
 
+    assert report.total_requests == 5
+    assert report.error_count == 2
+    assert report.average_response_time == 189
+    assert report.status_counts == {
+    200: 2,
+    500: 1,
+    404: 1,
+    204: 1,
+    }
+    assert report.endpoint_counts == {
+    "/api/users": 1,
+    "/api/login": 1,
+    "/api/products": 1,
+    "/api/users/15": 2,
+    }
 
 
 
