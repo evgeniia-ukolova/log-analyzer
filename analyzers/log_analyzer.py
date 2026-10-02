@@ -1,40 +1,31 @@
+from collections.abc import Iterable, Iterator
+from datetime import date
+from collections import Counter
+
+from models.log_entry import LogEntry, LogLevel, HTTPMethod
 from models.log_report import LogReport
 
-def count_requests(entries):
-    count = 0
-
-    for entry in entries:
-        count += 1
-
-    return count
 
 
-def count_status_codes(entries):
-    status_counts = {}
-
-    for entry in entries:
-        status_code = entry.status_code
-
-        if status_code in status_counts:
-            status_counts[status_code] += 1
-        else:
-            status_counts[status_code] = 1
-
-    return status_counts
+def count_requests(entries: Iterable[LogEntry]) -> int:
+    return sum(1 for _ in entries)
 
 
-def count_errors(entries):
-
-    count = 0
-    for entry in entries:
-
-        if entry.status_code >= 400:
-            count += 1
-
-    return count
+def count_status_codes(
+    entries: Iterable[LogEntry],
+) -> dict[int, int]:
+    return dict(Counter(entry.status_code for entry in entries))
 
 
-def average_response_time(entries):
+def count_errors(entries: Iterable[LogEntry]) -> int:
+    return sum(
+        1
+        for entry in entries
+        if entry.status_code >= 400
+    )
+
+
+def average_response_time(entries: Iterable[LogEntry]) -> float:
     total_time = 0
     count = 0
 
@@ -48,21 +39,13 @@ def average_response_time(entries):
     return total_time / count   
 
 
-def count_endpoints(entries):
-    endpoints_counts = {}
-
-    for entry in entries:
-        endpoint = entry.endpoint
-
-        if endpoint in endpoints_counts:
-            endpoints_counts[endpoint] += 1
-        else:
-            endpoints_counts[endpoint] = 1
-
-    return endpoints_counts
+def count_endpoints(
+    entries: Iterable[LogEntry],
+) -> dict[str, int]:
+    return dict(Counter(entry.endpoint for entry in entries))
 
 
-def top_endpoints(entries):
+def top_endpoints(entries: Iterable[LogEntry]) -> list[tuple[str, int]]:
     endpoint_counts = count_endpoints(entries)
 
     sorted_endpoints = sorted(
@@ -74,60 +57,83 @@ def top_endpoints(entries):
     return sorted_endpoints
 
 
-def slowest_requests(entries):
-    entries = list(entries)
-
-    result = sorted(
+def slowest_requests(
+    entries: Iterable[LogEntry],
+) -> list[LogEntry]:
+    
+    return sorted(
         entries,
         key=lambda entry: entry.response_time,
         reverse=True,
     )
 
-    return result
 
-
-def filter_by_level(entries, level):
+def filter_by_level(
+    entries: Iterable[LogEntry],
+    level: LogLevel,
+) -> Iterator[LogEntry]:   
+     
     for entry in entries:
         if entry.level == level:
             yield entry
 
 
-def filter_by_status(entries, status_code):
+def filter_by_status(
+    entries: Iterable[LogEntry],
+    status_code: int,
+) -> Iterator[LogEntry]:
+        
     for entry in entries:
         if entry.status_code == status_code:
             yield entry
 
 
-def filter_by_method(entries, method):
+def filter_by_method(
+    entries: Iterable[LogEntry],
+    method: HTTPMethod,
+) -> Iterator[LogEntry]:
+        
     for entry in entries:
         if entry.method == method:
             yield entry
  
 
-def filter_by_endpoint(entries, endpoint):
+def filter_by_endpoint(
+    entries: Iterable[LogEntry],
+    endpoint: str,
+) -> Iterator[LogEntry]:
+
     for entry in entries:
         if entry.endpoint == endpoint:
             yield entry
 
 
-def filter_by_response_time(entries, min_response_time):
+def filter_by_response_time(
+    entries: Iterable[LogEntry],
+    min_response_time: int,
+) -> Iterator[LogEntry]:
+
     for entry in entries:
         if entry.response_time >= min_response_time:
             yield entry
 
 
-def filter_by_date(entries, target_date):
+def filter_by_date(
+    entries: Iterable[LogEntry],
+    target_date: date,
+) -> Iterator[LogEntry]:
+
     for entry in entries:
         if entry.timestamp.date() == target_date:
             yield entry
 
 
-def build_report(entries):
+def build_report(entries: Iterable[LogEntry]) -> LogReport:
     total_requests = 0
     error_count = 0
     total_response_time = 0
-    status_counts = {}
-    endpoint_counts = {}
+    status_counts = Counter()
+    endpoint_counts = Counter()
 
     for entry in entries:
         total_requests += 1
@@ -136,33 +142,21 @@ def build_report(entries):
         if entry.status_code >= 400:
             error_count += 1
 
-        if entry.status_code in status_counts:
-            status_counts[entry.status_code] += 1
-        else:
-            status_counts[entry.status_code] = 1
+        status_counts[entry.status_code] += 1
+        endpoint_counts[entry.endpoint] += 1
 
-        if entry.endpoint in endpoint_counts:
-            endpoint_counts[entry.endpoint] += 1
-        else:
-            endpoint_counts[entry.endpoint] = 1
-
-        if total_requests == 0:
-            average_response_time = 0
-        else:
-            average_response_time = total_response_time / total_requests
+    if total_requests == 0:
+        average_response_time = 0.0
+    else:
+        average_response_time = total_response_time / total_requests
 
     return LogReport(
-    total_requests=total_requests,
-    error_count=error_count,
-    average_response_time=average_response_time,
-    status_counts=status_counts,
-    endpoint_counts=endpoint_counts,
+        total_requests=total_requests,
+        error_count=error_count,
+        average_response_time=average_response_time,
+        status_counts=dict(status_counts),
+        endpoint_counts=dict(endpoint_counts),
     )
-
-
-
-
-
 
 
 

@@ -4,7 +4,7 @@ from models.log_entry import LogLevel, HTTPMethod, LogEntry
 
 
 
-def parse_log_line(log_line: str) -> LogEntry:                  # преобразование строки в LogEntry
+def parse_log_line(log_line: str) -> LogEntry:
     parts = log_line.split()
 
     if len(parts) != 7:
