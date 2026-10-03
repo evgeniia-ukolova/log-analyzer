@@ -134,6 +134,7 @@ def build_report(entries: Iterable[LogEntry]) -> LogReport:
     total_response_time = 0
     status_counts = Counter()
     endpoint_counts = Counter()
+    slowest_request = None
 
     for entry in entries:
         total_requests += 1
@@ -144,6 +145,12 @@ def build_report(entries: Iterable[LogEntry]) -> LogReport:
 
         status_counts[entry.status_code] += 1
         endpoint_counts[entry.endpoint] += 1
+
+        if (
+            slowest_request is None
+            or entry.response_time > slowest_request.response_time
+        ):
+            slowest_request = entry
 
     if total_requests == 0:
         average_response_time = 0.0
@@ -156,6 +163,7 @@ def build_report(entries: Iterable[LogEntry]) -> LogReport:
         average_response_time=average_response_time,
         status_counts=dict(status_counts),
         endpoint_counts=dict(endpoint_counts),
+        slowest_request=slowest_request,
     )
 
 

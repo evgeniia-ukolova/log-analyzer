@@ -203,6 +203,9 @@ def test_build_report():
     "/api/products": 1,
     "/api/users/15": 2,
     }
+    assert report.slowest_request is not None
+    assert report.slowest_request.response_time == 340
+    assert report.slowest_request.endpoint == "/api/login"
 
 
 

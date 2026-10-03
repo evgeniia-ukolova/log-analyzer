@@ -151,7 +151,25 @@ def test_main_top_must_be_positive(monkeypatch, tmp_path):
         main()
 
 
+def test_main_shows_slowest_request(tmp_path, monkeypatch, capsys):
+    log_file = tmp_path / "server.log"
 
+    log_file.write_text(
+        "2026-09-24 10:15:01 INFO GET /api/users 200 120ms\n"
+        "2026-09-24 10:15:02 ERROR POST /api/login 500 340ms\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["main.py", str(log_file)],
+    )
+
+    main()
+
+    output = capsys.readouterr().out
+
+    assert "Самый медленный запрос: POST /api/login 340 ms" in output
 
 
 

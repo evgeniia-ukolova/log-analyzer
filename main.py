@@ -120,6 +120,15 @@ def main() -> None:
     print(f"Ошибок: {report.error_count}")
     print(f"Среднее время ответа: {report.average_response_time} ms")
 
+    if report.slowest_request is not None:
+        print(
+            "Самый медленный запрос: "
+            f"{report.slowest_request.method.value} "
+            f"{report.slowest_request.endpoint} "
+            f"{report.slowest_request.response_time} ms"
+        )
+
+
     print("\nHTTP-статусы:")
     for status_code, count in report.status_counts.items():
         print(f"{status_code}: {count}")
