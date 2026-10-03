@@ -1,5 +1,6 @@
-from main import main
 import pytest
+
+from main import main
 
 
 def test_main_filters_by_status(tmp_path, monkeypatch, capsys):
@@ -49,7 +50,99 @@ def test_main_filters_by_method(tmp_path, monkeypatch, capsys):
     assert "/api/login: 1" not in output
 
 
-def test_main_combines_filters(tmp_path, monkeypatch, capsys):              # несколько фильтров работают вместе 
+def test_main_filters_by_endpoint(tmp_path, monkeypatch, capsys):
+    log_file = tmp_path / "server.log"
+
+    log_file.write_text(
+        "2026-09-24 10:15:01 INFO GET /api/users 200 120ms\n"
+        "2026-09-24 10:15:02 ERROR GET /api/users/15 404 180ms\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["main.py", str(log_file), "--endpoint", "/api/users/15"],
+    )
+
+    main()
+
+    output = capsys.readouterr().out
+
+    assert "Всего запросов: 1" in output
+    assert "/api/users/15: 1" in output
+    assert "/api/users: 1" not in output
+
+
+def test_main_filters_by_response_time(tmp_path, monkeypatch, capsys):
+    log_file = tmp_path / "server.log"
+
+    log_file.write_text(
+        "2026-09-24 10:15:01 INFO GET /api/users 200 120ms\n"
+        "2026-09-24 10:15:02 ERROR POST /api/login 500 340ms\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["main.py", str(log_file), "--min-response-time", "200"],
+    )
+
+    main()
+
+    output = capsys.readouterr().out
+
+    assert "Всего запросов: 1" in output
+    assert "/api/login: 1" in output
+    assert "/api/users: 1" not in output
+
+
+def test_main_filters_by_date(tmp_path, monkeypatch, capsys):
+    log_file = tmp_path / "server.log"
+
+    log_file.write_text(
+        "2026-09-24 10:15:01 INFO GET /api/users 200 120ms\n"
+        "2026-09-25 10:15:02 ERROR POST /api/login 500 340ms\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["main.py", str(log_file), "--date", "2026-09-24"],
+    )
+
+    main()
+
+    output = capsys.readouterr().out
+
+    assert "Всего запросов: 1" in output
+    assert "/api/users: 1" in output
+    assert "/api/login: 1" not in output
+
+
+def test_main_filters_by_level(tmp_path, monkeypatch, capsys):
+    log_file = tmp_path / "server.log"
+
+    log_file.write_text(
+        "2026-09-24 10:15:01 INFO GET /api/users 200 120ms\n"
+        "2026-09-24 10:15:02 ERROR POST /api/login 500 340ms\n",
+        encoding="utf-8",
+    )
+
+    monkeypatch.setattr(
+        "sys.argv",
+        ["main.py", str(log_file), "--level", "ERROR"],
+    )
+
+    main()
+
+    output = capsys.readouterr().out
+
+    assert "Всего запросов: 1" in output
+    assert "/api/login: 1" in output
+    assert "/api/users: 1" not in output
+
+
+def test_main_combines_filters(tmp_path, monkeypatch, capsys):
     log_file = tmp_path / "server.log"
 
     log_file.write_text(
@@ -91,7 +184,6 @@ def test_main_file_not_found(monkeypatch, tmp_path):
 
     with pytest.raises(SystemExit):
         main()
-
 
 
 def test_main_invalid_log_line(monkeypatch, tmp_path):
@@ -170,32 +262,3 @@ def test_main_shows_slowest_request(tmp_path, monkeypatch, capsys):
     output = capsys.readouterr().out
 
     assert "Самый медленный запрос: POST /api/login 340 ms" in output
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

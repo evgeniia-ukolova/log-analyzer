@@ -1,7 +1,8 @@
-import pytest
 from datetime import datetime
 
-from models.log_entry import LogLevel, HTTPMethod
+import pytest
+
+from models.log_entry import HTTPMethod, LogLevel
 from parsers.log_parser import parse_log_line
 
 
@@ -26,7 +27,7 @@ def test_parse_invalid_log_line():
 
 
 def test_invalid_timestamp():
-    log_line = "2026-99-99 10:15:02 ERROR FETCH /api/login 500 340ms"
+    log_line = "2026-99-99 10:15:02 ERROR POST /api/login 500 340ms"
 
     with pytest.raises(ValueError):
         parse_log_line(log_line)
@@ -58,47 +59,3 @@ def test_invalid_response_time():
 
     with pytest.raises(ValueError):
         parse_log_line(log_line)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

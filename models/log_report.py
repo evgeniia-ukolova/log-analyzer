@@ -1,5 +1,3 @@
-# итоговый отчёт
-
 from dataclasses import dataclass
 
 from models.log_entry import LogEntry
@@ -13,46 +11,3 @@ class LogReport:
     status_counts: dict[int, int]
     endpoint_counts: dict[str, int]
     slowest_request: LogEntry | None
-
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

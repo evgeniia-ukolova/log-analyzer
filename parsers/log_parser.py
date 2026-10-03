@@ -1,7 +1,6 @@
 from datetime import datetime
 
-from models.log_entry import LogLevel, HTTPMethod, LogEntry
-
+from models.log_entry import HTTPMethod, LogEntry, LogLevel
 
 
 def parse_log_line(log_line: str) -> LogEntry:
@@ -10,20 +9,23 @@ def parse_log_line(log_line: str) -> LogEntry:
     if len(parts) != 7:
         raise ValueError("Некорректный формат строки лога")
 
-    date_str, time_str, level_str, method, endpoint, status_code_str, response_time_str = parts
+    (
+        date_str,
+        time_str,
+        level_str,
+        method_str,
+        endpoint,
+        status_code_str,
+        response_time_str,
+    ) = parts
 
-    timestamp = f"{date_str} {time_str}"
-    timestamp = datetime.fromisoformat(timestamp)
-
+    timestamp = datetime.fromisoformat(f"{date_str} {time_str}")
     level = LogLevel(level_str)
-
-    method = HTTPMethod(method)
-
+    method = HTTPMethod(method_str)
     status_code = int(status_code_str)
-
     response_time = int(response_time_str.removesuffix("ms"))
 
-    log_entry = LogEntry(
+    return LogEntry(
         timestamp=timestamp,
         level=level,
         method=method,
@@ -31,7 +33,3 @@ def parse_log_line(log_line: str) -> LogEntry:
         status_code=status_code,
         response_time=response_time,
     )
-    return log_entry
-
-
-

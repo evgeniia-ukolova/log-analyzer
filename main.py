@@ -1,19 +1,18 @@
 import argparse
-from pathlib import Path
 from datetime import date
+from pathlib import Path
 
 from analyzers.log_analyzer import (
     build_report,
-    filter_by_status,
-    filter_by_method,
-    filter_by_endpoint,
-    filter_by_response_time,
     filter_by_date,
+    filter_by_endpoint,
     filter_by_level,
+    filter_by_method,
+    filter_by_response_time,
+    filter_by_status,
 )
-from readers.log_reader import read_log_entries
 from models.log_entry import HTTPMethod, LogLevel
-
+from readers.log_reader import read_log_entries
 
 
 def main() -> None:
@@ -69,12 +68,10 @@ def main() -> None:
         help="Показать N самых частых endpoints",
     )
 
-
-
-
-
-
     args = parser.parse_args()
+
+    if args.top is not None and args.top <= 0:
+        parser.error("--top должен быть больше 0")
 
     try:
         entries = read_log_entries(args.file)
@@ -94,20 +91,11 @@ def main() -> None:
                 args.min_response_time,
             )
 
-        if args.level is not None:
-            entries = filter_by_level(entries, args.level)
-
         if args.date is not None:
             entries = filter_by_date(entries, args.date)
 
-        if args.top is not None and args.top <= 0:
-                    parser.error("--top должен быть больше 0")
-
-
-
-
-
-
+        if args.level is not None:
+            entries = filter_by_level(entries, args.level)
 
         report = build_report(entries)
 
@@ -128,7 +116,6 @@ def main() -> None:
             f"{report.slowest_request.response_time} ms"
         )
 
-
     print("\nHTTP-статусы:")
     for status_code, count in report.status_counts.items():
         print(f"{status_code}: {count}")
@@ -148,27 +135,6 @@ def main() -> None:
         print(f"{endpoint}: {count}")
 
 
-
 if __name__ == "__main__":
     main()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    
